@@ -1,6 +1,9 @@
 from plone.app.testing import IntegrationTesting
 from plone.app.testing import PLONE_FIXTURE
 from plone.app.testing import PloneSandboxLayer
+from plone.app.testing import applyProfile
+from plone.registry.interfaces import IRegistry
+from zope.component import getUtility
 from zope.configuration import xmlconfig
 
 
@@ -13,6 +16,10 @@ class RandomContentLayer(PloneSandboxLayer):
         import collective.randomcontent
         xmlconfig.file('configure.zcml', collective.randomcontent,
                       context=configurationContext)
+
+    def setUpPloneSite(self, portal):
+        # Apply our profile.
+        applyProfile(portal, 'collective.randomcontent:default')
 
 RANDOM_CONTENT_FIXTURE = RandomContentLayer()
 RANDOM_CONTENT_INTEGRATION_TESTING = IntegrationTesting(
@@ -45,3 +52,18 @@ def make_test_doc(context):
     doc = context[new_id]
     doc.reindexObject()  # Might have already happened, but let's be sure.
     return doc
+
+
+def make_test_folder(context, register=False):
+    new_id = context.generateUniqueId('Folder')
+    context.invokeFactory('Folder', new_id)
+    folder = context[new_id]
+    folder.reindexObject()
+    if register:
+        # Register as random content folder
+        registry = getUtility(IRegistry)
+        randomContentFolder = registry.records.get(
+            'collective.randomcontent.interfaces.IRandomContentSettings'
+            '.randomContentFolder')
+        randomContentFolder.value = '/'.join(folder.getPhysicalPath())
+    return folder

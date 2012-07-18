@@ -60,7 +60,11 @@ class RandomImage(RandomCatalogImage):
                               name='plone_portal_state')
         root_path = pps.navigation_root_path()
         portal = pps.portal()
-        path = '/'.join([root_path, content_path])
+        if content_path.startswith(root_path):
+            path = content_path
+        else:
+            path = '/'.join([root_path, content_path])
+        path = path.replace('//', '/')
         target = portal.unrestrictedTraverse(path, None)
         if target:
             # Acquisition could mean the target has a different
@@ -70,7 +74,9 @@ class RandomImage(RandomCatalogImage):
         if portal_path == root_path:
             # Already checked
             return '/'
-        path = '/'.join([portal_path, content_path])
+        if not content_path.startswith(portal_path):
+            path = '/'.join([portal_path, content_path])
+        path = path.replace('//', '/')
         target = portal.unrestrictedTraverse(path, None)
         if target:
             # Acquisition could mean the target has a different
