@@ -8,9 +8,9 @@ class IRandomContentSettings(Interface):
     """RandomContent settings
     """
 
-    randomContentFolder = schema.Choice(
-        title=_(u"Random content folder"),
-        description=_(u"The folder that contains the random content."),
+    randomContentFolder = schema.ASCIILine(
+        title=_(u"Path to random content folder"),
+        description=_(u"Path to the folder that contains the random content. "
+                      u"The navigation root would have / as path."),
         required=False,
-        source='collective.randomcontent.folders',
         )

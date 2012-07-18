@@ -1,4 +1,3 @@
-import logging
 import random
 
 from Acquisition import aq_inner
@@ -6,8 +5,7 @@ from Products.CMFCore.utils import getToolByName
 from Products.Five import BrowserView
 from plone.registry.interfaces import IRegistry
 from zope.component import getUtility
-
-logger = logging.getLogger('collective.randomcontent')
+from zope.component import getMultiAdapter
 
 
 class RandomCatalogImage(BrowserView):
@@ -56,13 +54,26 @@ class RandomImage(RandomCatalogImage):
             '.randomContentFolder')
         if not randomContentFolder or not randomContentFolder.value:
             return '/'
-        UID = randomContentFolder.value
+        content_path = randomContentFolder.value
         context = aq_inner(self.context)
-        # Note: if we would use the uid_catalog, we do not get a
-        # workable path from the brain.
-        catalog = getToolByName(context, 'portal_catalog')
-        brains = catalog(UID=UID)
-        if not brains:
-            logger.warn('No object found for UID %s' % UID)
+        pps = getMultiAdapter((context, self.request),
+                              name='plone_portal_state')
+        root_path = pps.navigation_root_path()
+        portal = pps.portal()
+        path = '/'.join([root_path, content_path])
+        target = portal.unrestrictedTraverse(path, None)
+        if target:
+            # Acquisition could mean the target has a different
+            # physical path.
+            return '/'.join(target.getPhysicalPath())
+        portal_path = '/'.join(portal.getPhysicalPath())
+        if portal_path == root_path:
+            # Already checked
             return '/'
-        return brains[0].getPath()
+        path = '/'.join([portal_path, content_path])
+        target = portal.unrestrictedTraverse(path, None)
+        if target:
+            # Acquisition could mean the target has a different
+            # physical path.
+            return '/'.join(target.getPhysicalPath())
+        return '/'

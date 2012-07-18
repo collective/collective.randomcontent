@@ -16,12 +16,6 @@
       provides="Products.GenericSetup.interfaces.EXTENSION"
       />
 
-  <utility
-      provides="zope.schema.interfaces.IVocabularyFactory"
-      component="collective.randomcontent.vocabularies.FolderVocabularyFactory"
-      name="collective.randomcontent.folders"
-      />
-
   <browser:page
       name="collective-randomcontent-settings"
       for="Products.CMFCore.interfaces.ISiteRoot"
