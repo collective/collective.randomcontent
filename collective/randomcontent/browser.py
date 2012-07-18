@@ -8,7 +8,7 @@ from zope.component import getUtility
 from zope.component import getMultiAdapter
 
 
-class RandomCatalogImage(BrowserView):
+class RandomSiteImage(BrowserView):
 
     portal_type = 'Image'
 
@@ -45,7 +45,7 @@ class RandomCatalogImage(BrowserView):
         return ""
 
 
-class RandomImage(RandomCatalogImage):
+class RandomImage(RandomSiteImage):
 
     def _get_path(self):
         registry = getUtility(IRegistry)

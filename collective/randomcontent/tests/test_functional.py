@@ -13,9 +13,9 @@ class TestRandomContent(unittest.TestCase):
 
     layer = RANDOM_CONTENT_INTEGRATION_TESTING
 
-    def testRandomCatalogNoImage(self):
+    def testRandomSiteNoImage(self):
         portal = self.layer['portal']
-        view = portal.restrictedTraverse('randomcatalogimage')
+        view = portal.restrictedTraverse('randomsiteimage')
         result = view()
         # There are no images, so we only get an empty string.
         self.assertFalse(result)
@@ -23,11 +23,11 @@ class TestRandomContent(unittest.TestCase):
         self.assertEqual(response.status, 200)
         self.assertEqual(response.headers.get('location'), None)
 
-    def testRandomCatalogImage(self):
+    def testRandomSiteImage(self):
         portal = self.layer['portal']
         setRoles(portal, TEST_USER_ID, ('Manager',))
         image = make_test_image(portal)
-        view = portal.restrictedTraverse('randomcatalogimage')
+        view = portal.restrictedTraverse('randomsiteimage')
         result = view()
         self.assertFalse(result)
         response = self.layer['request'].response
@@ -90,7 +90,7 @@ class TestRandomContent(unittest.TestCase):
         setRoles(portal, TEST_USER_ID, ('Manager',))
         for i in range(5):
             make_test_image(portal)
-        view = portal.restrictedTraverse('randomcatalogimage')
+        view = portal.restrictedTraverse('randomsiteimage')
         locations = set()
         for i in range(10):
             result = view()

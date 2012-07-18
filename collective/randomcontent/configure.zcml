@@ -25,8 +25,8 @@
 
   <browser:page
       for="*"
-      name="randomcatalogimage"
-      class=".browser.RandomCatalogImage"
+      name="randomsiteimage"
+      class=".browser.RandomSiteImage"
       permission="zope2.View"
       />
 

@@ -53,14 +53,14 @@ The following views are available:
 and redirects to this url.  The image must be in a specific folder,
 that you set in the control panel.
 
-- ``@@randomcatalogimage``: this picks a random image from your site
+- ``@@randomsiteimage``: this picks a random image from your site
 and redirects to this url.  The image can be anywhere in your site.
 
 - ``@@randomcontent``: this picks a random content item from your site
 and redirects to this url.  The content must be in a specific folder,
 that you set in the control panel.
 
-- ``@@randomcatalogcontent``: this picks a random content item from your site
+- ``@@randomsitecontent``: this picks a random content item from your site
 and redirects to this url.  The content can be anywhere in your site.
 
 
