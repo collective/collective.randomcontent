@@ -200,3 +200,43 @@ class TestRandomContent(unittest.TestCase):
             self.assertTrue(location)
             locations.add(location)
         self.assertEqual(len(locations), 1)
+
+    def testRandomSiteImageOtherFolder(self):
+        # Check that we can use the views (or one of them anyway) on a
+        # regular folder.
+        portal = self.layer['portal']
+        setRoles(portal, TEST_USER_ID, ('Manager',))
+        image = make_test_image(portal)
+        folder = make_test_folder(portal)
+        view = folder.restrictedTraverse('randomsiteimage')
+        result = view()
+        self.assertFalse(result)
+        response = self.layer['request'].response
+        self.assertEqual(response.status, 302)
+        self.assertEqual(response.headers.get('location'),
+                         image.absolute_url())
+
+    def testRandomSiteImageNavigationRoot(self):
+        # Searching for an image in the entire site still takes the
+        # navigation root into account.
+        portal = self.layer['portal']
+        setRoles(portal, TEST_USER_ID, ('Manager',))
+        make_test_image(portal)
+        folder = make_test_folder(portal)
+        from plone.app.layout.navigation.interfaces import INavigationRoot
+        from zope.interface import alsoProvides
+        alsoProvides(folder, INavigationRoot)
+        folder_image = make_test_image(folder)
+        view = folder.restrictedTraverse('randomsiteimage')
+        locations = set()
+        for i in range(10):
+            result = view()
+            self.assertFalse(result)
+            response = self.layer['request'].response
+            self.assertEqual(response.status, 302)
+            location = response.headers.get('location')
+            self.assertTrue(location)
+            locations.add(location)
+        self.assertEqual(len(locations), 1)
+        self.assertEqual(locations.pop(),
+                         folder_image.absolute_url())
