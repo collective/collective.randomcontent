@@ -1,6 +1,5 @@
 import unittest2 as unittest
 
-from Products.CMFCore.utils import getToolByName
 from plone.app.testing import TEST_USER_ID
 from plone.app.testing import setRoles
 
@@ -51,8 +50,8 @@ class TestRandomContent(unittest.TestCase):
     def testRandomImageWithEmptyFolder(self):
         portal = self.layer['portal']
         setRoles(portal, TEST_USER_ID, ('Manager',))
-        image = make_test_image(portal)
-        folder = make_test_folder(portal, register=True)
+        make_test_image(portal)
+        make_test_folder(portal, register=True)
         view = portal.restrictedTraverse('randomimage')
         result = view()
         # There are no images, so we only get an empty string.
@@ -60,6 +59,31 @@ class TestRandomContent(unittest.TestCase):
         response = self.layer['request'].response
         self.assertEqual(response.status, 200)
         self.assertEqual(response.headers.get('location'), None)
+
+    def testRandomImage(self):
+        portal = self.layer['portal']
+        setRoles(portal, TEST_USER_ID, ('Manager',))
+        make_test_image(portal)
+        folder = make_test_folder(portal, register=True)
+        folder_image = make_test_image(folder)
+        view = portal.restrictedTraverse('randomimage')
+        result = view()
+        self.assertFalse(result)
+        response = self.layer['request'].response
+        self.assertEqual(response.status, 302)
+        self.assertEqual(response.headers.get('location'),
+                         folder_image.absolute_url())
+        # Let's see if that is not a lucky break.
+        locations = set()
+        for i in range(10):
+            result = view()
+            self.assertFalse(result)
+            response = self.layer['request'].response
+            self.assertEqual(response.status, 302)
+            location = response.headers.get('location')
+            self.assertTrue(location)
+            locations.add(location)
+        self.assertEqual(len(locations), 1)
 
     def testRandomness(self):
         portal = self.layer['portal']
