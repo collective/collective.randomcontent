@@ -37,4 +37,18 @@
       permission="zope2.View"
       />
 
+  <browser:page
+      for="*"
+      name="randomsitecontent"
+      class=".browser.RandomSiteContent"
+      permission="zope2.View"
+      />
+
+  <browser:page
+      for="*"
+      name="randomcontent"
+      class=".browser.RandomContent"
+      permission="zope2.View"
+      />
+
 </configure>

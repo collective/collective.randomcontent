@@ -8,9 +8,9 @@ from zope.component import getUtility
 from zope.component import getMultiAdapter
 
 
-class RandomSiteImage(BrowserView):
+class BaseRandomView(BrowserView):
 
-    portal_type = 'Image'
+    portal_type = None
 
     def _nocache(self):
         """Don't you dare cache this ever.
@@ -26,31 +26,17 @@ class RandomSiteImage(BrowserView):
         self.request.response.setHeader(
             'Pragma', 'no-cache')
 
-    def _get_path(self):
+    def _get_nav_root_path(self):
+        """Get the navigation root path.
+        """
         context = aq_inner(self.context)
         pps = getMultiAdapter((context, self.request),
                               name='plone_portal_state')
         return pps.navigation_root_path()
 
-    def _filter(self):
-        return dict(portal_type=self.portal_type,
-                    path=self._get_path())
-
-    def __call__(self):
-        self._nocache()
-        context = aq_inner(self.context)
-        catalog = getToolByName(context, 'portal_catalog')
-        images = catalog(**self._filter())
-        if not images:
-            return ""
-        rnd = random.randint(0, len(images) - 1)
-        self.request.RESPONSE.redirect(images[rnd].getURL())
-        return ""
-
-
-class RandomImage(RandomSiteImage):
-
-    def _get_path(self):
+    def _get_folder_path(self):
+        """Get the path of the folder selected for random content.
+        """
         context = aq_inner(self.context)
         pps = getMultiAdapter((context, self.request),
                               name='plone_portal_state')
@@ -86,3 +72,70 @@ class RandomImage(RandomSiteImage):
             # physical path.
             return '/'.join(target.getPhysicalPath())
         return root_path
+
+    def _get_path(self):
+        """Get the path in which we will look for random content.
+
+        By default we use the navigation root path.
+        """
+        return self._get_nav_root_path()
+
+    def _update_filter(self, myfilter):
+        """Update the filter.
+
+        By default we do nothing.  Override this if you need special
+        handling.  The filter is passed to the portal_catalog.
+        """
+        pass
+
+    def _filter(self):
+        myfilter = {}
+        path = self._get_path()
+        if path:
+            myfilter['path'] = path
+        if self.portal_type:
+            myfilter['portal_type'] = self.portal_type
+        self._update_filter(myfilter)
+        return myfilter
+
+    def __call__(self):
+        self._nocache()
+        context = aq_inner(self.context)
+        catalog = getToolByName(context, 'portal_catalog')
+        brains = catalog(**self._filter())
+        if not brains:
+            return ""
+        rnd = random.randint(0, len(brains) - 1)
+        self.request.RESPONSE.redirect(brains[rnd].getURL())
+        return ""
+
+
+class RandomSiteContent(BaseRandomView):
+    pass
+
+
+class RandomContent(BaseRandomView):
+
+    def _get_path(self):
+        """Get the path in which we will look for random content.
+
+        We want to look in the selected folder.
+        """
+        return self._get_folder_path()
+
+
+class RandomSiteImage(BaseRandomView):
+
+    portal_type = 'Image'
+
+
+class RandomImage(BaseRandomView):
+
+    portal_type = 'Image'
+
+    def _get_path(self):
+        """Get the path in which we will look for random content.
+
+        We want to look in the selected folder.
+        """
+        return self._get_folder_path()
