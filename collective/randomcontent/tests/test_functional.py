@@ -5,7 +5,7 @@ from plone.app.testing import setRoles
 
 from collective.randomcontent.testing import (
     RANDOM_CONTENT_INTEGRATION_TESTING,
-    make_test_doc, make_test_image, make_test_folder
+    make_test_doc, make_test_image, make_test_folder, register_path,
     )
 
 
@@ -240,3 +240,50 @@ class TestRandomContent(unittest.TestCase):
         self.assertEqual(len(locations), 1)
         self.assertEqual(locations.pop(),
                          folder_image.absolute_url())
+
+    def test_path(self):
+        # Test some corner cases.
+        def get_path(obj):
+            return '/'.join(obj.getPhysicalPath())
+
+        portal = self.layer['portal']
+        setRoles(portal, TEST_USER_ID, ('Manager',))
+        nav_root = make_test_folder(portal)
+        from plone.app.layout.navigation.interfaces import INavigationRoot
+        from zope.interface import alsoProvides
+        alsoProvides(nav_root, INavigationRoot)
+
+        portal_view = portal.restrictedTraverse('randomcontent')
+        nav_root_view = nav_root.restrictedTraverse('randomcontent')
+        self.assertEqual(portal_view._get_nav_root_path(),
+                         get_path(portal))
+        self.assertEqual(nav_root_view._get_nav_root_path(),
+                         get_path(nav_root))
+        self.assertEqual(portal_view._get_folder_path(),
+                         get_path(portal))
+        self.assertEqual(nav_root_view._get_folder_path(),
+                         get_path(nav_root))
+
+        folder = make_test_folder(portal, register=True)
+        self.assertEqual(portal_view._get_folder_path(),
+                         get_path(folder))
+        self.assertEqual(nav_root_view._get_folder_path(),
+                         get_path(folder))
+
+        # Make two folders with the same id
+        folder_in_portal = make_test_folder(portal, 'target')
+        folder_in_nav_root = make_test_folder(nav_root, 'target')
+        # The path does not need to be the full path from the zope
+        # root.
+        register_path('target')
+        self.assertEqual(portal_view._get_folder_path(),
+                         get_path(folder_in_portal))
+        self.assertEqual(nav_root_view._get_folder_path(),
+                         get_path(folder_in_nav_root))
+
+        # If the path cannot be traversed, so be it.
+        register_path('non-existing')
+        self.assertEqual(portal_view._get_folder_path(),
+                         get_path(portal))
+        self.assertEqual(nav_root_view._get_folder_path(),
+                         get_path(nav_root))

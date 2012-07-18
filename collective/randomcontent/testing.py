@@ -54,16 +54,22 @@ def make_test_doc(context):
     return doc
 
 
-def make_test_folder(context, register=False):
-    new_id = context.generateUniqueId('Folder')
+def register_path(path):
+    # Register as random content folder
+    registry = getUtility(IRegistry)
+    randomContentFolder = registry.records.get(
+        'collective.randomcontent.interfaces.IRandomContentSettings'
+        '.randomContentFolder')
+    randomContentFolder.value = path
+
+
+def make_test_folder(context, new_id=None, register=False):
+    if not new_id:
+        new_id = context.generateUniqueId('Folder')
     context.invokeFactory('Folder', new_id)
     folder = context[new_id]
     folder.reindexObject()
     if register:
         # Register as random content folder
-        registry = getUtility(IRegistry)
-        randomContentFolder = registry.records.get(
-            'collective.randomcontent.interfaces.IRandomContentSettings'
-            '.randomContentFolder')
-        randomContentFolder.value = '/'.join(folder.getPhysicalPath())
+        register_path('/'.join(folder.getPhysicalPath()))
     return folder
