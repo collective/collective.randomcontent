@@ -264,22 +264,34 @@ class TestRandomContent(unittest.TestCase):
         self.assertEqual(nav_root_view._get_folder_path(),
                          get_path(nav_root))
 
-        folder = make_test_folder(portal, register=True)
+        top_folder = make_test_folder(portal, new_id='top', register=True)
         self.assertEqual(portal_view._get_folder_path(),
-                         get_path(folder))
+                         get_path(top_folder))
         self.assertEqual(nav_root_view._get_folder_path(),
-                         get_path(folder))
+                         get_path(top_folder))
+        # The path does not need to be the full path from the zope
+        # root.
+        register_path('top')
+        self.assertEqual(portal_view._get_folder_path(),
+                         get_path(top_folder))
+        self.assertEqual(nav_root_view._get_folder_path(),
+                         get_path(top_folder))
 
         # Make two folders with the same id
         folder_in_portal = make_test_folder(portal, 'target')
         folder_in_nav_root = make_test_folder(nav_root, 'target')
-        # The path does not need to be the full path from the zope
-        # root.
         register_path('target')
         self.assertEqual(portal_view._get_folder_path(),
                          get_path(folder_in_portal))
         self.assertEqual(nav_root_view._get_folder_path(),
                          get_path(folder_in_nav_root))
+
+        # Try with the top level folder again, calling the view on a
+        # folder at a deeper level.
+        register_path('top')
+        view = folder_in_nav_root.restrictedTraverse('randomcontent')
+        self.assertEqual(view._get_folder_path(),
+                         get_path(top_folder))
 
         # If the path cannot be traversed, so be it.
         register_path('non-existing')
