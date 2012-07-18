@@ -36,6 +36,30 @@ class TestRandomContent(unittest.TestCase):
         self.assertEqual(response.headers.get('location'),
                          image.absolute_url())
 
+    def testRandomImageNoFolder(self):
+        portal = self.layer['portal']
+        setRoles(portal, TEST_USER_ID, ('Manager',))
+        image = make_test_image(portal)
+        view = portal.restrictedTraverse('randomcatalogimage')
+        result = view()
+        self.assertFalse(result)
+        response = self.layer['request'].response
+        self.assertEqual(response.status, 302)
+        self.assertEqual(response.headers.get('location'),
+                         image.absolute_url())
+
+    def testRandomImageNoFolder(self):
+        portal = self.layer['portal']
+        setRoles(portal, TEST_USER_ID, ('Manager',))
+        image = make_test_image(portal)
+        view = portal.restrictedTraverse('randomcatalogimage')
+        result = view()
+        self.assertFalse(result)
+        response = self.layer['request'].response
+        self.assertEqual(response.status, 302)
+        self.assertEqual(response.headers.get('location'),
+                         image.absolute_url())
+
     def testRandomness(self):
         portal = self.layer['portal']
         setRoles(portal, TEST_USER_ID, ('Manager',))

@@ -2,16 +2,44 @@
     xmlns="http://namespaces.zope.org/zope"
     xmlns:browser="http://namespaces.zope.org/browser"
     xmlns:five="http://namespaces.zope.org/five"
+    xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
     xmlns:i18n="http://namespaces.zope.org/i18n"
     i18n_domain="collective.randomcontent">
 
   <include package="Products.CMFCore" />
   <five:registerPackage package="." />
+  <genericsetup:registerProfile
+      name="default"
+      title="Random Content"
+      directory="profiles/default"
+      description='Extension profile for collective.randomcontent.'
+      provides="Products.GenericSetup.interfaces.EXTENSION"
+      />
+
+  <utility
+      provides="zope.schema.interfaces.IVocabularyFactory"
+      component="collective.randomcontent.vocabularies.FolderVocabularyFactory"
+      name="collective.randomcontent.folders"
+      />
 
   <browser:page
-      for="Products.CMFPlone.interfaces.IPloneSiteRoot"
+      name="collective-randomcontent-settings"
+      for="Products.CMFCore.interfaces.ISiteRoot"
+      class=".settings.SettingsView"
+      permission="cmf.ManagePortal"
+      />
+
+  <browser:page
+      for="*"
       name="randomcatalogimage"
       class=".browser.RandomCatalogImage"
+      permission="zope2.View"
+      />
+
+  <browser:page
+      for="*"
+      name="randomimage"
+      class=".browser.RandomImage"
       permission="zope2.View"
       />
 

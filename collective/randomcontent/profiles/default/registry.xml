@@ -1,0 +1,3 @@
+<registry>
+  <records interface="collective.randomcontent.interfaces.IRandomContentSettings" />
+</registry>
