@@ -6,13 +6,13 @@
     i18n_domain="collective.randomcontent">
 
   <include package="Products.CMFCore" />
-  <five:registerPackage package="." initialize=".initialize" />
+  <five:registerPackage package="." />
 
   <browser:page
       for="Products.CMFPlone.interfaces.IPloneSiteRoot"
-      name="collective-randomcontent"
-      class=".browser.Cleanup"
-      permission="cmf.ManagePortal"
+      name="randomcatalogimage"
+      class=".browser.RandomCatalogImage"
+      permission="zope2.View"
       />
 
 </configure>
