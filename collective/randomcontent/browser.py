@@ -27,7 +27,10 @@ class RandomSiteImage(BrowserView):
             'Pragma', 'no-cache')
 
     def _get_path(self):
-        return '/'
+        context = aq_inner(self.context)
+        pps = getMultiAdapter((context, self.request),
+                              name='plone_portal_state')
+        return pps.navigation_root_path()
 
     def _filter(self):
         return dict(portal_type=self.portal_type,
@@ -48,17 +51,17 @@ class RandomSiteImage(BrowserView):
 class RandomImage(RandomSiteImage):
 
     def _get_path(self):
+        context = aq_inner(self.context)
+        pps = getMultiAdapter((context, self.request),
+                              name='plone_portal_state')
+        root_path = pps.navigation_root_path()
         registry = getUtility(IRegistry)
         randomContentFolder = registry.records.get(
             'collective.randomcontent.interfaces.IRandomContentSettings'
             '.randomContentFolder')
         if not randomContentFolder or not randomContentFolder.value:
-            return '/'
+            return root_path
         content_path = randomContentFolder.value
-        context = aq_inner(self.context)
-        pps = getMultiAdapter((context, self.request),
-                              name='plone_portal_state')
-        root_path = pps.navigation_root_path()
         portal = pps.portal()
         if content_path.startswith(root_path):
             path = content_path
@@ -73,7 +76,7 @@ class RandomImage(RandomSiteImage):
         portal_path = '/'.join(portal.getPhysicalPath())
         if portal_path == root_path:
             # Already checked
-            return '/'
+            return root_path
         if not content_path.startswith(portal_path):
             path = '/'.join([portal_path, content_path])
         path = path.replace('//', '/')
@@ -82,4 +85,4 @@ class RandomImage(RandomSiteImage):
             # Acquisition could mean the target has a different
             # physical path.
             return '/'.join(target.getPhysicalPath())
-        return '/'
+        return root_path
