@@ -29,4 +29,7 @@ setup(name='collective.randomcontent',
           'setuptools',
           'plone.app.registry',
       ],
+      extras_require={
+          'test': ['plone.app.testing'],
+      },
       )
