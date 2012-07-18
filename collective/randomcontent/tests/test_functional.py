@@ -13,6 +13,26 @@ class TestRandomContent(unittest.TestCase):
 
     layer = RANDOM_CONTENT_INTEGRATION_TESTING
 
+
+    def testRandomness(self):
+        portal = self.layer['portal']
+        setRoles(portal, TEST_USER_ID, ('Manager',))
+        for i in range(5):
+            make_test_image(portal)
+        view = portal.restrictedTraverse('randomsiteimage')
+        locations = set()
+        for i in range(10):
+            result = view()
+            self.assertFalse(result)
+            response = self.layer['request'].response
+            self.assertEqual(response.status, 302)
+            location = response.headers.get('location')
+            self.assertTrue(location)
+            locations.add(location)
+        # Assure that not the same image is returned each time.  Note:
+        # this is expected to fail once every 10 million times.
+        self.assertTrue(len(locations) > 1)
+
     def testRandomSiteNoImage(self):
         portal = self.layer['portal']
         view = portal.restrictedTraverse('randomsiteimage')
@@ -84,22 +104,3 @@ class TestRandomContent(unittest.TestCase):
             self.assertTrue(location)
             locations.add(location)
         self.assertEqual(len(locations), 1)
-
-    def testRandomness(self):
-        portal = self.layer['portal']
-        setRoles(portal, TEST_USER_ID, ('Manager',))
-        for i in range(5):
-            make_test_image(portal)
-        view = portal.restrictedTraverse('randomsiteimage')
-        locations = set()
-        for i in range(10):
-            result = view()
-            self.assertFalse(result)
-            response = self.layer['request'].response
-            self.assertEqual(response.status, 302)
-            location = response.headers.get('location')
-            self.assertTrue(location)
-            locations.add(location)
-        # Assure that not the same image is returned each time.  Note:
-        # this is expected to fail once every 10 million times.
-        self.assertTrue(len(locations) > 1)
