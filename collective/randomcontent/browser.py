@@ -59,18 +59,6 @@ class BaseRandomView(BrowserView):
             # Acquisition could mean the target has a different
             # physical path.
             return '/'.join(target.getPhysicalPath())
-        portal_path = '/'.join(portal.getPhysicalPath())
-        if portal_path == root_path:
-            # Already checked
-            return root_path
-        if not content_path.startswith(portal_path):
-            path = '/'.join([portal_path, content_path])
-        path = path.replace('//', '/')
-        target = portal.unrestrictedTraverse(path, None)
-        if target:
-            # Acquisition could mean the target has a different
-            # physical path.
-            return '/'.join(target.getPhysicalPath())
         return root_path
 
     def _get_path(self):
