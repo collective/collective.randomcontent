@@ -51,7 +51,12 @@ Add ``collective.randomcontent`` to the eggs of your buildout (zcml is
 not explicitly needed), rerun buildout and start your zope instance.
 
 Install ``collective.randomcontent`` in the Site Setup.  Go to its
-control panel and choose a folder in your site where we take images from.
+control panel and choose a folder in your site where we take images
+from.
+
+Note that when you only want to use ``@@randomsiteimage`` or
+``@@randomsitecontent``, you do not need to install this package in
+the site setup.
 
 
 Details
