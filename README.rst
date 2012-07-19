@@ -20,6 +20,16 @@ The main use case would be: a random header background image.  Use
 loads the css file and wants to apply the background image, it will
 get redirected to the image.
 
+Example css code for when you want a random background image on all
+pages except the front page, is this::
+
+  #portal-header {
+    background: url(@@randomimage) no-repeat 0 0;
+  }
+  .section-front-page #portal-header {
+    background: #ee0;
+  }
+
 
 Alternative
 -----------
