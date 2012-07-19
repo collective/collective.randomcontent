@@ -4,7 +4,7 @@
     xmlns:i18n="http://xml.zope.org/namespaces/i18n"
     i18n:domain="collective.randomcontent">
   <configlet
-      title="RandomContent Settings"
+      title="Random Content Settings"
       action_id="collective.randomcontent.settings"
       appId="collective.randomcontent"
       category="Products"
